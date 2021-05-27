@@ -35,13 +35,14 @@ public class UserMealsUtil {
         for (UserMeal userMeal : meals) {
             LocalTime localTime = LocalTime.of(userMeal.getDateTime().getHour(), userMeal.getDateTime().getMinute());
             if (startTime.isBefore(localTime) && endTime.isAfter(localTime)) {
-                filteredlist.add(new UserMealWithExcess(userMeal.getDateTime(), userMeal.getDescription(), userMeal.getCalories(), checkExceed(meals, userMeal, caloriesPerDay)));
+                boolean exceed = checkExceed(meals, userMeal, caloriesPerDay);
+                filteredlist.add(new UserMealWithExcess(userMeal.getDateTime(), userMeal.getDescription(), userMeal.getCalories(), exceed));
             }
         }
         return filteredlist;
     }
 
-    public static Boolean checkExceed(List<UserMeal> meals, UserMeal userMeal, int calories) {
+    public static Boolean checkExceed(List<UserMeal> meals, UserMeal userMeal, int calories)  {
         LocalDate ld = LocalDate.of(userMeal.getDateTime().getYear(), userMeal.getDateTime().getMonth(), userMeal.getDateTime().getDayOfMonth());
         int currentCalories = 0;
         for (UserMeal meal : meals) {
