@@ -9,7 +9,6 @@ import java.time.LocalTime;
 import java.time.Month;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class UserMealsUtil {
     public static void main(String[] args) {
@@ -35,7 +34,7 @@ public class UserMealsUtil {
 
         for (UserMeal userMeal : meals) {
             LocalTime localTime = LocalTime.of(userMeal.getDateTime().getHour(), userMeal.getDateTime().getMinute());
-            if (startTime.isBefore(localTime) && endTime.isAfter(localTime)) {
+            if (TimeUtil.isBetweenHalfOpen(localTime, startTime, endTime)) {
                 filteredlist.add(new UserMealWithExcess(userMeal.getDateTime(), userMeal.getDescription(), userMeal.getCalories(), exceededDays.getOrDefault(getLocalDateByLocalDateTime(userMeal.getDateTime()), false)));
             }
         }
@@ -63,10 +62,10 @@ public class UserMealsUtil {
 
     public static List<UserMealWithExcess> filteredByStreams(List<UserMeal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         Map<LocalDate, Boolean> exceededDays = getMapExceededLocalDate(meals, caloriesPerDay);
-        List<UserMeal> filteredList = meals.stream().filter(meal-> LocalTime.of(meal.getDateTime().getHour(), meal.getDateTime().getMinute()).isAfter(startTime)&&LocalTime.of(meal.getDateTime().getHour(), meal.getDateTime().getMinute()).isBefore(endTime)).collect(Collectors.toList());
-        List<UserMealWithExcess> d= new ArrayList<>();
-        filteredList.forEach(meal-> d.add(new UserMealWithExcess(meal.getDateTime(),meal.getDescription(),meal.getCalories(),exceededDays.getOrDefault(getLocalDateByLocalDateTime(meal.getDateTime()), false))));
-        return d;
+        List<UserMeal> filteredList = meals.stream().filter(meal-> TimeUtil.isBetweenHalfOpen(LocalTime.of(meal.getDateTime().getHour(),meal.getDateTime().getMinute()), startTime, endTime)).collect(Collectors.toList());
+        List<UserMealWithExcess> filteredListWithExceed= new ArrayList<>();
+        filteredList.forEach(meal-> filteredListWithExceed.add(new UserMealWithExcess(meal.getDateTime(),meal.getDescription(),meal.getCalories(),exceededDays.getOrDefault(getLocalDateByLocalDateTime(meal.getDateTime()), false))));
+        return filteredListWithExceed;
     }
 
     public static LocalDate getLocalDateByLocalDateTime(LocalDateTime localDateTime){
