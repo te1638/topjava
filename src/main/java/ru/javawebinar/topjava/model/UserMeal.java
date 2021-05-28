@@ -1,5 +1,8 @@
 package ru.javawebinar.topjava.model;
 
+import javafx.util.converter.LocalDateStringConverter;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class UserMeal {
